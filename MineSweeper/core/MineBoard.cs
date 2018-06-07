@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
+
 namespace MineSweeper.core
 {
     public class MineBoard
@@ -33,25 +35,33 @@ namespace MineSweeper.core
 
 				if(blocksBoards[randomX,randomY].blockType.Equals(BlockType.NORMAL)){
 					blocksBoards[randomX, randomY].blockType = BlockType.MINE;
+					blocksBoards[randomX, randomY].blockColor = Color.Yellow;
 					placedMines++;
 				}
 			}
 		}
 
 		private void setMinesNumbers(){
-			int countMines;
-			foreach(Block block in blocksBoards){
-				countMines = 0;
-				for (int x = retrieveLowestNumber(block.x, 1); x < retrieveRightNumber(block.x, 1); x++ ){
-					for (int y = retrieveLowestNumber(block.y, 1); y < retrieveDownNumber(block.y, 1); y++)
-                    {
-						if(blocksBoards[x,y].blockType.Equals(BlockType.MINE)){
-							countMines++;
-						}
-                    }	
-				}
-				block.blockValue = countMines;
+			foreach(Block block in blocksBoards)
+			{
+				block.blockValue = retrieveNumberOfMines(block);
 			}
+		}
+
+		private int retrieveNumberOfMines(Block block)
+		{
+			int countMines = 0;
+			for (int x = retrieveLowestNumber(block.x, 1); x < retrieveRightNumber(block.x, 1); x++)
+			{
+				for (int y = retrieveLowestNumber(block.y, 1); y < retrieveDownNumber(block.y, 1); y++)
+				{
+					if (blocksBoards[x, y].blockType.Equals(BlockType.MINE))
+					{
+						countMines++;
+					}
+				}
+			}
+			return countMines;
 		}
 
 		private int retrieveLowestNumber(int currentValue, int amount){
@@ -81,5 +91,20 @@ namespace MineSweeper.core
             }
             return currentValue;
         }
+  
+		public bool setBLockClickVisible(int x, int y){
+			Rectangle fakeRectangle = new Rectangle(x, y, 1, 1);
+			foreach(Block block in blocksBoards){
+				if(block.positionRectangle.Intersects(fakeRectangle)){
+					block.isVisible = true;
+					if(block.blockType.Equals(BlockType.MINE)){
+						block.blockColor = Color.Red;
+						return true;
+					}
+					return false;
+				}
+			}
+			return false;
+		}
 	}
 }

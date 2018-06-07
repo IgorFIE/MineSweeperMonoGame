@@ -13,6 +13,10 @@ namespace MineSweeper {
         private SpriteFont arialFont;
 		private MineBoard mineBoard;
 
+		private int clickDelayCounter;
+		private float counterUntilGameOver;
+		private bool isGameOver;
+
         public MineSweeper() {
             initGraphics();
             Content.RootDirectory = "Content";
@@ -44,17 +48,38 @@ namespace MineSweeper {
             arialFont = Content.Load<SpriteFont>("Fonts/Arial");
         }
 
-        protected override void Update(GameTime gameTime) {
-            handleEscape();
-			handleLeftClick();
-			handleRightClick();
-            base.Update(gameTime);
-        }
+        protected override void Update(GameTime gameTime)
+		{
+			handleControllers();
+			if(isGameOver){
+				if(counterUntilGameOver > GameProperties.GAME_OVER_TIMER){
+					Exit();
+				} else {
+					counterUntilGameOver += (float)gameTime.ElapsedGameTime.TotalSeconds;
+				}
+			}
+			base.Update(gameTime);
+		}
+
+		private void handleControllers()
+		{
+			handleEscape();
+			if (clickDelayCounter > GameProperties.GAME_CLICK_DELAY)
+			{
+				handleLeftClick();
+				handleRightClick();
+			}
+			else
+			{
+				clickDelayCounter++;
+			}
+		}
 
 		private void handleRightClick()
         {
 			if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
+				clickDelayCounter = 0;
 				Console.WriteLine("RightClick");
             }
         }
@@ -62,7 +87,8 @@ namespace MineSweeper {
         {
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                Console.WriteLine("LeftClick");
+				clickDelayCounter = 0;
+				isGameOver = mineBoard.setBLockClickVisible(Mouse.GetState().X, Mouse.GetState().Y);
             }
         }
 
@@ -79,27 +105,51 @@ namespace MineSweeper {
             base.Draw(gameTime);
         }
 
-        private void drawNewScreen() {
-            spriteBatch.Begin();
+        private void drawNewScreen()
+		{
+			spriteBatch.Begin();
+			drawMinesBoard();
+			spriteBatch.End();
+		}
 
-			foreach(Block block in mineBoard.blocksBoards){
-				if(block.blockType.Equals(BlockType.MINE)){
-					spriteBatch.Draw(defaultTexture,block.positionRectangle,Color.Yellow);
-					spriteBatch.DrawString(arialFont, "M", new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
-					continue;
+		private void drawMinesBoard()
+		{
+			foreach (Block block in mineBoard.blocksBoards)
+			{
+				if (block.isVisible || isGameOver)
+				{
+					drawMineBlock(block);
+					drawNormalBlock(block);
+				} else {
+					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.White);	
 				}
-
-				if (block.blockType.Equals(BlockType.NORMAL))
-                {
-                    spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.White);
-					if(block.blockValue > 0){
-						spriteBatch.DrawString(arialFont, block.blockValue.ToString(), new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
-                    }
-                    continue;
-                }
 			}
+		}
 
-            spriteBatch.End();
-        }
-    }
+		private void drawMineBlock(Block block)
+		{
+			if (block.blockType.Equals(BlockType.MINE))
+			{
+				spriteBatch.Draw(defaultTexture, block.positionRectangle, block.blockColor);
+				spriteBatch.DrawString(arialFont, "M", new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
+			}
+		}
+
+		private void drawNormalBlock(Block block)
+		{
+			if (block.blockType.Equals(BlockType.NORMAL))
+			{
+				spriteBatch.Draw(defaultTexture, block.positionRectangle, block.blockColor);
+				drawBlockNumber(block);
+			}
+		}
+
+		private void drawBlockNumber(Block block)
+		{
+			if (block.blockValue > 0)
+			{
+				spriteBatch.DrawString(arialFont, block.blockValue.ToString(), new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
+			}
+		}
+	}
 }

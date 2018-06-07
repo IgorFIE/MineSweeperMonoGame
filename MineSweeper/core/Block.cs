@@ -11,12 +11,16 @@ namespace MineSweeper.core
 		public BlockType blockType { get; set; }
 		public int blockValue { get; set; }
 		public Rectangle positionRectangle { get; private set; }
+		public Color blockColor;
+
+		public bool isVisible { get; set; }
 
         public Block(int x, int y)
         {
 			this.x = x;
 			this.y = y;
 			blockType = BlockType.NORMAL;
+			blockColor = Color.White;
 			positionRectangle = new Rectangle((int)((x * GameProperties.BLOCK_SIZE) * GameProperties.BLOCK_MARGIN),
 			                                  (int)((y * GameProperties.BLOCK_SIZE) * GameProperties.BLOCK_MARGIN),
 			                                  GameProperties.BLOCK_SIZE, GameProperties.BLOCK_SIZE);
