@@ -58,7 +58,21 @@ namespace MineSweeper {
 					counterUntilGameOver += (float)gameTime.ElapsedGameTime.TotalSeconds;
 				}
 			}
+			checkIfAllMinesAreSecured();
 			base.Update(gameTime);
+		}
+
+		private void checkIfAllMinesAreSecured()
+		{
+			int countCorrectFlags = 0;
+			foreach(Block block in mineBoard.blocksBoards){
+				if(block.blockType.Equals(BlockType.MINE) && block.flag.Equals(BlockType.FLAG)){
+					countCorrectFlags++;
+				}
+			}
+			if(countCorrectFlags == GameProperties.MINES_NUMBER){
+				isGameOver = true;
+			}
 		}
 
 		private void handleControllers()
@@ -80,7 +94,7 @@ namespace MineSweeper {
 			if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
 				clickDelayCounter = 0;
-				Console.WriteLine("RightClick");
+                isGameOver = mineBoard.setBLockClickVisible(Mouse.GetState().X, Mouse.GetState().Y, true);
             }
         }
 		private void handleLeftClick()
@@ -118,8 +132,9 @@ namespace MineSweeper {
 			{
 				if (block.isVisible || isGameOver)
 				{
-					drawMineBlock(block);
-					drawNormalBlock(block);
+					drawFlagBlock(block);
+                    drawMineBlock(block);
+                    drawNormalBlock(block);
 				} else {
 					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.DarkGray);	
 				}
@@ -128,7 +143,7 @@ namespace MineSweeper {
 
 		private void drawMineBlock(Block block)
 		{
-			if (block.blockType.Equals(BlockType.MINE))
+			if (block.blockType.Equals(BlockType.MINE) && !block.flag.Equals(BlockType.FLAG))
 			{
 				spriteBatch.Draw(defaultTexture, block.positionRectangle, block.blockColor);
 				spriteBatch.DrawString(arialFont, "M", new Vector2(block.positionRectangle.X, 
@@ -136,9 +151,23 @@ namespace MineSweeper {
 			}
 		}
 
+		private void drawFlagBlock(Block block)
+        {
+            if (block.flag.Equals(BlockType.FLAG))
+            {
+				if(isGameOver && !block.blockType.Equals(BlockType.MINE)){
+					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.Red);
+				} else {
+					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.LightGreen);
+                }
+                spriteBatch.DrawString(arialFont, "F", new Vector2(block.positionRectangle.X,
+                    block.positionRectangle.Y), Color.Black);
+            }
+        }
+
 		private void drawNormalBlock(Block block)
 		{
-			if (block.blockType.Equals(BlockType.NORMAL))
+			if (block.blockType.Equals(BlockType.NORMAL)&& !block.flag.Equals(BlockType.FLAG))
 			{
 				spriteBatch.Draw(defaultTexture, block.positionRectangle, block.blockColor);
 				drawBlockNumber(block);

@@ -92,20 +92,43 @@ namespace MineSweeper.core
             }
             return currentValue;
         }
-  
-		public bool setBLockClickVisible(int x, int y){
+
+		public bool setBLockClickVisible(int x, int y)
+		{
+			return setBLockClickVisible(x, y,false);
+		}
+
+		public bool setBLockClickVisible(int x, int y, bool setFlag){
 			Rectangle fakeRectangle = new Rectangle(x, y, 1, 1);
 			bool wasMineClicked = false;
 			foreach(Block block in blocksBoards){
 				if(block.positionRectangle.Intersects(fakeRectangle))
 				{
-					block.isVisible = true;
-					wasMineClicked = checkIfMineWasClicked(block);
-					retrieveAreaBlocks(wasMineClicked, block);
+					if(!setFlag){
+						block.isVisible = true;
+                        wasMineClicked = checkIfMineWasClicked(block);
+                        retrieveAreaBlocks(wasMineClicked, block);                  
+                    } else {
+                        toogleFlag(block);
+                    }
 					break;
 				}
 			}
 			return wasMineClicked;
+		}
+
+		private static void toogleFlag(Block block)
+		{
+			if (block.flag.Equals(BlockType.FLAG))
+			{
+				block.flag = BlockType.NORMAL;
+				block.isVisible = false;
+			}
+			else
+			{
+				block.flag = BlockType.FLAG;
+				block.isVisible = true;
+			}
 		}
 
 		private void retrieveAreaBlocks(bool wasMineClicked, Block block)
@@ -145,7 +168,7 @@ namespace MineSweeper.core
 
 		private bool checkIfMineWasClicked(Block block)
 		{
-			if (block.blockType.Equals(BlockType.MINE))
+			if (block.blockType.Equals(BlockType.MINE) && !block.flag.Equals(BlockType.FLAG))
 			{
 				block.blockColor = Color.Red;
 				return true;

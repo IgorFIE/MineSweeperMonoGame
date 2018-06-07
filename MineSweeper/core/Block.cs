@@ -9,7 +9,9 @@ namespace MineSweeper.core
 	    public int y { get; private set; }
         
 		public BlockType blockType { get; set; }
+		public BlockType flag { get; set; }
 		public int blockValue { get; set; }
+
 		public Rectangle positionRectangle { get; private set; }
 		public Color blockColor;
 
