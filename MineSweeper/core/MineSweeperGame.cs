@@ -100,7 +100,7 @@ namespace MineSweeper {
         }
 
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+			GraphicsDevice.Clear(Color.DarkSlateGray);
             drawNewScreen();
             base.Draw(gameTime);
         }
@@ -121,7 +121,7 @@ namespace MineSweeper {
 					drawMineBlock(block);
 					drawNormalBlock(block);
 				} else {
-					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.White);	
+					spriteBatch.Draw(defaultTexture, block.positionRectangle, Color.DarkGray);	
 				}
 			}
 		}
@@ -131,7 +131,8 @@ namespace MineSweeper {
 			if (block.blockType.Equals(BlockType.MINE))
 			{
 				spriteBatch.Draw(defaultTexture, block.positionRectangle, block.blockColor);
-				spriteBatch.DrawString(arialFont, "M", new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
+				spriteBatch.DrawString(arialFont, "M", new Vector2(block.positionRectangle.X, 
+                    block.positionRectangle.Y), Color.Black);
 			}
 		}
 
@@ -148,7 +149,8 @@ namespace MineSweeper {
 		{
 			if (block.blockValue > 0)
 			{
-				spriteBatch.DrawString(arialFont, block.blockValue.ToString(), new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
+				spriteBatch.DrawString(arialFont, block.blockValue.ToString(), 
+                   new Vector2(block.positionRectangle.X, block.positionRectangle.Y), Color.Black);
 			}
 		}
 	}

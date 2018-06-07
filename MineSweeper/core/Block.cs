@@ -20,7 +20,7 @@ namespace MineSweeper.core
 			this.x = x;
 			this.y = y;
 			blockType = BlockType.NORMAL;
-			blockColor = Color.White;
+			blockColor = Color.LightGray;
 			positionRectangle = new Rectangle((int)((x * GameProperties.BLOCK_SIZE) * GameProperties.BLOCK_MARGIN),
 			                                  (int)((y * GameProperties.BLOCK_SIZE) * GameProperties.BLOCK_MARGIN),
 			                                  GameProperties.BLOCK_SIZE, GameProperties.BLOCK_SIZE);

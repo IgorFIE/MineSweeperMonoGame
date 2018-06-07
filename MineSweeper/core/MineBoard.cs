@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace MineSweeper.core
@@ -94,15 +95,60 @@ namespace MineSweeper.core
   
 		public bool setBLockClickVisible(int x, int y){
 			Rectangle fakeRectangle = new Rectangle(x, y, 1, 1);
+			bool wasMineClicked = false;
 			foreach(Block block in blocksBoards){
-				if(block.positionRectangle.Intersects(fakeRectangle)){
+				if(block.positionRectangle.Intersects(fakeRectangle))
+				{
 					block.isVisible = true;
-					if(block.blockType.Equals(BlockType.MINE)){
-						block.blockColor = Color.Red;
-						return true;
-					}
-					return false;
+					wasMineClicked = checkIfMineWasClicked(block);
+					retrieveAreaBlocks(wasMineClicked, block);
+					break;
 				}
+			}
+			return wasMineClicked;
+		}
+
+		private void retrieveAreaBlocks(bool wasMineClicked, Block block)
+		{
+			if (!wasMineClicked && block.blockValue == 0)
+			{
+				List<Block> blocksToCheck = new List<Block>();
+                List<Block> blocksChecked = new List<Block>();
+				blocksToCheck.Add(block);
+
+				while(blocksToCheck.Count > 0){
+					if(blocksToCheck[0].blockValue == 0)
+					{
+						retrieveBlocksToCheck(blocksToCheck, blocksChecked);
+					}
+					blocksChecked.Add(blocksToCheck[0]);
+					blocksToCheck.RemoveAt(0);
+				}
+			}
+		}
+
+		private void retrieveBlocksToCheck(List<Block> blocksToCheck, List<Block> blocksChecked)
+		{
+			for (int x = retrieveLowestNumber(blocksToCheck[0].x, 1); x < retrieveRightNumber(blocksToCheck[0].x, 1); x++)
+			{
+				for (int y = retrieveLowestNumber(blocksToCheck[0].y, 1); y < retrieveDownNumber(blocksToCheck[0].y, 1); y++)
+				{
+					if ((x != blocksToCheck[0].x || y != blocksToCheck[0].y) &&
+					   !blocksToCheck.Contains(blocksBoards[x, y]) && !blocksChecked.Contains(blocksBoards[x, y]))
+					{
+						blocksBoards[x, y].isVisible = true;
+						blocksToCheck.Add(blocksBoards[x, y]);
+					}
+				}
+			}
+		}
+
+		private bool checkIfMineWasClicked(Block block)
+		{
+			if (block.blockType.Equals(BlockType.MINE))
+			{
+				block.blockColor = Color.Red;
+				return true;
 			}
 			return false;
 		}
